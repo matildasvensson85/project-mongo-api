@@ -2,6 +2,8 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
+import listEndpoints from 'express-list-endpoints'
+
 
 // If you're using one of our datasets, uncomment the appropriate import below
 // to get started!
@@ -46,6 +48,11 @@ Animal.deleteMany().then(() => {
 })
 
 // Movie model
+
+const Category = mongoose.model('Category', {
+  category: String
+})
+
 const Movie = mongoose.model('Movie', {
   year_film: Number,
   year_award: Number,
@@ -54,11 +61,6 @@ const Movie = mongoose.model('Movie', {
   nominee: String,
   film: String,
   win: Boolean
-})
-
-// Nominee model
-const Nominee = mongoose.model('Nominee', {
-  nominee: String
 })
 
 // Instance of movie model
@@ -85,9 +87,13 @@ const Nominee = mongoose.model('Nominee', {
   // console.log('resetting')
   const seedDataBase = async () => {
     await Movie.deleteMany({})
+    await Category.deleteMany()
 
     await goldenGlobesData.forEach((globesData) => {
       new Movie(globesData).save()
+    })
+    await goldenGlobesData.forEach((globesData) => {
+      new Category(globesData).save()
     })
   }
   seedDataBase()
@@ -96,7 +102,8 @@ const Nominee = mongoose.model('Nominee', {
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('Hello hello hello world')
+  res.send(listEndpoints(app))
+  // res.send('Hello hello hello world')
 })
 
 // app.get('/movies', (req, res) => {
@@ -127,7 +134,11 @@ app.get('/movies', async (req, res) => {
     const movies = await Movie.find()
     res.json(movies)
   }
+})
 
+app.get('/movies/categories', async (req, res) => {
+  const categories = await Category.find()
+  res.json(categories)
 })
 
 // app.get('/movies/year/:year', async (req, res) => {
@@ -143,11 +154,31 @@ app.get('/movies/id/:id', async (req, res) => {
   res.json(movieByID)
 })
 
-// Endpoint param to get nominees by name
+//Endpoint to get movie by name
+// app.get('/movies/name/:name', async (req, res) => {
+//   const { nominee } = req.params
+  // const { film } = req.params
+  // const filmByName = await Movie.findOne({ film: film })
+  // const movieByNominee = await Movie.findOne({ nominee: nominee })
+  // if (film === filmByName) {
+  //   res.json(filmByName)
+  // } else if ()
+// })
+
+// Endpoint to get movies by name
+
+app.get('/movies/name/:name', async (req, res) => {
+  const { name } = req.params
+  const movieByNominee = await Movie.find({ nominee: name })
+  const movieByFilm = await Movie.find({ film: name })
+  res.json({ movieByNominee, movieByFilm })
+})
+
+// Endpoint param to get nominees 
 app.get('/movies/nominee/:nominee', async (req, res) => {
   const { nominee } = req.params
-  const nomineeByName = await Movie.findOne({ nominee: nominee })
-  res.json(nomineeByName)
+  const movieByNominee = await Movie.findOne({ nominee: nominee })
+  res.json(movieByNominee)
 })
 
 // Endpoint query all movies from one year
