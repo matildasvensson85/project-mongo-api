@@ -29,7 +29,10 @@ app.use(bodyParser.json())
 
 // Animal model
 const Animal = mongoose.model('Animal', {
-  name: String,
+  name: {
+    type: String,
+    lowercase: true
+  },
   age: Number,
   isFurry: Boolean
 })
@@ -82,6 +85,7 @@ const Nominee = mongoose.model('Nominee', {
   // console.log('resetting')
   const seedDataBase = async () => {
     await Movie.deleteMany({})
+
     await goldenGlobesData.forEach((globesData) => {
       new Movie(globesData).save()
     })
@@ -102,33 +106,56 @@ app.get('/', (req, res) => {
 //   })
 // }) 
 
+// Endpoint to get all movies
+// app.get('/movies', async (req, res) => {
+//   const movies = await Movie.find()
+//   res.json(movies)
+// })
+
 app.get('/movies', async (req, res) => {
-  const movies = await Movie.find()
-  res.json(movies)
-})
-
-app.get('/movies/:id', async (req, res) => {
-  const { id } = req.params
-  const singleMovie = await Movie.findOne({ _id: id })
-  res.json(singleMovie)
-})
-
-
-app.get('nominees', async (req, res) => {
-  const nominees = await Nominee.find()
-  res.json(nominees)
-})
-
-app.get('/moviejson', (req, res) => {
-  //query to get nominee by name, eg. '?nominee=Avatar'
-  const nominee = req.query.nominee
-  if (nominee) {
-    const moviesByNominee = goldenGlobesData.filter((movie) => movie.nominee === nominee)
-    res.json(moviesByNominee)
+  // Queries to filter further
+  const { year } = req.query
+  const { win } = req.query
+  
+  if (year) {
+    const movieByYear = await Movie.find({ year_film: year })
+    res.json(movieByYear)
+  } else if (win) {
+    const movieByWin = await Movie.find({ win: win })
+    res.json(movieByWin)
   } else {
-    res.json(goldenGlobesData)
-  } 
+    const movies = await Movie.find()
+    res.json(movies)
+  }
+
 })
+
+// app.get('/movies/year/:year', async (req, res) => {
+//   const { year } = req.params
+//   const movieByYear = await Movie.find({ year_film: year })
+//   res.json(movieByYear)
+// }) 
+
+// Endpoint param to get movie by id
+app.get('/movies/id/:id', async (req, res) => {
+  const { id } = req.params
+  const movieByID = await Movie.findOne({ _id: id })
+  res.json(movieByID)
+})
+
+// Endpoint param to get nominees by name
+app.get('/movies/nominee/:nominee', async (req, res) => {
+  const { nominee } = req.params
+  const nomineeByName = await Movie.findOne({ nominee: nominee })
+  res.json(nomineeByName)
+})
+
+// Endpoint query all movies from one year
+// app.get('/movies/win/:win', async (req, res) => {
+//   const { win } = req.params
+//   const moviesThatWon = await Movie.find({ win: win })
+//   res.json(moviesThatWon)
+// }) 
 
 app.get('/animals', (req, res) => {
   Animal.find().then(animals => {
@@ -136,17 +163,28 @@ app.get('/animals', (req, res) => {
   })
 })
 
-app.get('/animals/:name', (req, res) => {
-  Animal.findOne({ name: req.params.name }).then(animal => {
-    if(animal) {
-      res.json(animal)
-    } else {
-      res.status(404).json({ error: 'not founfd'})
-    }
-  })
+app.get('/animals/name/:name', async (req, res) => {
+  const { name } = req.params
+  const singleAnimal = await Animal.findOne({ name: name })
+  res.json(singleAnimal)
+})
+
+app.get('/animals/id/:id', async (req, res) => {
+  const { animalId } = req.params
+  const singleAnimalById = await Animal.findById({ animalId })
+  res.json(singleAnimalById)
 })
 
 
+// app.get('/animals/:name', (req, res) => {
+//   Animal.findOne({ name: req.params.name }).then(animal => {
+//     if(animal) {
+//       res.json(animal)
+//     } else {
+//       res.status(404).json({ error: 'not founfd'})
+//     }
+//   })
+// })
 
 
 // app.get('/:name', async (req, res) => {
