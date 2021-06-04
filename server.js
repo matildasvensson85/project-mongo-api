@@ -29,9 +29,9 @@ const Nominee = mongoose.model('Nominee', {
   nominee: String
 })
 
-// INSTANCE OF MODEL
+// INSTANCE OF MODEL //
 
-// if (process.env.RESET_DB) {
+if (process.env.RESET_DB) {
   const seedDataBase = async () => {
     await Movie.deleteMany({})
     // await Movie.deleteMany()
@@ -50,10 +50,9 @@ const Nominee = mongoose.model('Nominee', {
     })
   }
   seedDataBase()
-// }
+}
 
 const port = process.env.PORT || 8080
-// app.listen(port, () => console.log(`Server running on http://localhost:${port}`))
 const app = express()
 
 // Middlewares to enable cors and json body parsing
