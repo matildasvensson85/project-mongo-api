@@ -53,11 +53,12 @@ if (process.env.RESET_DB) {
 }
 
 const port = process.env.PORT || 8080
+// app.listen(port, () => console.log(`Server running on http://localhost:${port}`))
 const app = express()
 
 // Middlewares to enable cors and json body parsing
 app.use(cors())
-app.use(bodyParser.json())
+app.use(express.json())
 
 
 // ROUTES
