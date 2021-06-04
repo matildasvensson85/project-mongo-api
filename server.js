@@ -31,7 +31,7 @@ const Nominee = mongoose.model('Nominee', {
 
 // INSTANCE OF MODEL //
 
-if (process.env.RESET_DB) {
+// if (process.env.RESET_DB) {
   const seedDataBase = async () => {
     await Movie.deleteMany({})
     // await Movie.deleteMany()
@@ -50,7 +50,7 @@ if (process.env.RESET_DB) {
     })
   }
   seedDataBase()
-}
+// }
 
 const port = process.env.PORT || 8080
 const app = express()
