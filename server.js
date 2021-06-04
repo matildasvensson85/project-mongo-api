@@ -10,13 +10,6 @@ const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/project-mongo"
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.Promise = Promise
 
-const port = process.env.PORT || 8080
-const app = express()
-
-// Middlewares to enable cors and json body parsing
-app.use(cors())
-app.use(bodyParser.json())
-
 // MONGOOSE MODELS
 const Movie = mongoose.model('Movie', {
   year_film: Number,
@@ -41,6 +34,7 @@ const Nominee = mongoose.model('Nominee', {
 if (process.env.RESET_DB) {
   const seedDataBase = async () => {
     await Movie.deleteMany({})
+    // await Movie.deleteMany()
     await Category.deleteMany()
     await Nominee.deleteMany()
 
@@ -57,6 +51,13 @@ if (process.env.RESET_DB) {
   }
   seedDataBase()
 }
+
+const port = process.env.PORT || 8080
+const app = express()
+
+// Middlewares to enable cors and json body parsing
+app.use(cors())
+app.use(bodyParser.json())
 
 
 // ROUTES
