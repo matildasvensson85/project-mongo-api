@@ -17,7 +17,6 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
-
 // MONGOOSE MODELS
 const Movie = mongoose.model('Movie', {
   year_film: Number,
@@ -40,7 +39,6 @@ const Nominee = mongoose.model('Nominee', {
 // INSTANCE OF MODEL
 
 if (process.env.RESET_DB) {
-  console.log('resetting')
   const seedDataBase = async () => {
     await Movie.deleteMany({})
     await Category.deleteMany()
